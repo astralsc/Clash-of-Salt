@@ -22,7 +22,7 @@ namespace ClashofClans.Protocol.Messages.Server.Battle
         public override void Encode()
         {
             Writer.WriteInt(0);
-            Writer.WriteInt(TimeUtils.CurrentUnixTimestamp);
+            Writer.WriteInt(-1);
 
             LogicNpcAvatar(Writer);
             Device.Player.LogicClientAvatar(Writer);

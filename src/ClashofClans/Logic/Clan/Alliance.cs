@@ -52,7 +52,12 @@ namespace ClashofClans.Logic.Clan
             }
         }
 
-        public void AllianceRankingEntry(IByteBuffer packet)
+        public void AllianceRankingEntry(IByteBuffer packet, int order)
+        {
+            // TODO
+        }
+
+        public void RankingEntry(IByteBuffer packet, int order)
         {
             // TODO
         }

@@ -39,6 +39,7 @@ namespace ClashofClans.Logic.Manager
         public List<VillageObject> VillageObjects = new List<VillageObject>();
         public List<VillageObject> VillageObjects2 = new List<VillageObject>();
         public int LastNewsSeen { get; set; }
+        public int LastLeagueRank { get; set; }
 
         /// <summary>
         ///     Returns the Townhall level from this Village

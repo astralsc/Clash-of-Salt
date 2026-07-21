@@ -11,8 +11,6 @@ namespace ClashofClans.Protocol.Commands.Client
 
         public override void Decode()
         {
-            Reader.ReadInt();
-
             base.Decode();
         }
     }

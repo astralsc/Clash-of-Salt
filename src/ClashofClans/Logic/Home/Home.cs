@@ -17,6 +17,9 @@ namespace ClashofClans.Logic.Home
         [JsonIgnore] public ComponentManager ComponentManager = new ComponentManager();
         [JsonIgnore] public GameObjectManager GameObjectManager = new GameObjectManager();
         [JsonProperty("resources")] public ResourceSlots Resources = new ResourceSlots();
+        [JsonProperty("characters")] public HeroesManager Characters = new HeroesManager();
+        [JsonProperty("units")] public UnitsManager Units = new UnitsManager();
+        [JsonProperty("settings")] public SettingsManager Settings = new SettingsManager();
         [JsonIgnore] public List<Session> Sessions = new List<Session>(50);
         [JsonProperty("stream")] public List<AvatarStreamEntry> Stream = new List<AvatarStreamEntry>(40);
         [JsonIgnore] public Time Time = new Time();

@@ -1,5 +1,6 @@
 ﻿using ClashofClans.Logic;
 using ClashofClans.Protocol.Messages.Server;
+using ClashofClans.Protocol.Messages.Server.Security;
 using ClashofClans.Utilities.Netty;
 using DotNetty.Buffers;
 
@@ -35,10 +36,19 @@ namespace ClashofClans.Protocol.Messages.Client.Login
 
         public override async void Process()
         {
-            await new LoginFailedMessage(Device)
+            /*if (FingerprintSha == Resources.Fingerprint.Sha)
             {
-                ErrorCode = 8
-            }.SendAsync();
+                await new ServerHelloMessage(Device)
+                {
+                }.SendAsync();
+            }
+            else
+            {*/
+                await new LoginFailedMessage(Device)
+                {
+                    ErrorCode = 8
+                }.SendAsync();
+            //}
         }
     }
 }

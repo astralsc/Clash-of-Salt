@@ -4,6 +4,10 @@ using ClashofClans.Utilities.Netty;
 using ClashofClans.Utilities.Utils;
 using DotNetty.Buffers;
 using Newtonsoft.Json;
+using ClashofClans.Logic.Manager.Items;
+using ClashofClans.Files.CsvUtils;
+using ClashofClans.Logic.Clan;
+using ClashofClans.Logic.Sessions;
 
 namespace ClashofClans.Logic
 {
@@ -30,7 +34,7 @@ namespace ClashofClans.Logic
 
         public void LogicClientHome(IByteBuffer packet)
         {
-            packet.WriteInt(TimeUtils.CurrentUnixTimestamp);
+            packet.WriteInt(0);
 
             // Home Id
             packet.WriteLong(Home.Id);
@@ -63,11 +67,8 @@ namespace ClashofClans.Logic
                 Home.DefensesWon = 0;
             }
 
-            // Account Id
-            packet.WriteLong(Home.Id);
-
-            // Home Id
-            packet.WriteLong(Home.Id);
+            packet.WriteLong(Home.Id); // AccountId
+            packet.WriteLong(Home.Id); // HomeId
 
             packet.WriteBoolean(true); // HasAlliance
             {
@@ -78,33 +79,43 @@ namespace ClashofClans.Logic
                 packet.WriteInt(0); // Level
             }
 
-            packet.WriteBoolean(false);
-            packet.WriteLong(1);
+            packet.WriteBoolean(Home.League != 0); // LeagueBool
+            if (Home.League != 0)
+                packet.WriteLong(Home.League); // League
+
+            packet.WriteInt(0);
+            packet.WriteInt(1);
+
+            {
+                packet.WriteInt(0);
+                packet.WriteInt(1000);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+            }
+            {
+                packet.WriteInt(0);
+                packet.WriteInt(1000);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+                packet.WriteInt(0);
+            }
 
             packet.WriteInt(0);
             packet.WriteInt(0);
-            packet.WriteInt(1000);
             packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(1000);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(22/*Home.League*/); // League
+            packet.WriteInt(Home.League); // League
+
             packet.WriteInt(0);
             packet.WriteInt(10);
             packet.WriteInt(0);
@@ -112,53 +123,54 @@ namespace ClashofClans.Logic
             packet.WriteInt(0);
             packet.WriteInt(0);
             packet.WriteInt(0);
-            packet.WriteInt(0);
+            packet.WriteInt(Home.GameObjectManager.GetTownhallLevel()); // TownhallLevel
             packet.WriteInt(0);
             packet.WriteInt(0);
             packet.WriteInt(0);
 
-            packet.WriteScString(Home.Name);
-            packet.WriteScString(null); // Facebook
-
-            packet.WriteInt(Home.ExpLevel); // Level
-            packet.WriteInt(Home.ExpPoints); // Exp
-
-            packet.WriteInt(Home.Diamonds);
-            packet.WriteInt(Home.Diamonds);
-
+            packet.WriteScString(Home.Name); // Name
+            packet.WriteScString(null); // FacebookId
+            packet.WriteInt(Home.ExpLevel); // ExpLevel
+            packet.WriteInt(Home.ExpPoints); // ExpPoints
+            packet.WriteInt(Home.Diamonds); // Diamonds
+            packet.WriteInt(Home.Diamonds); // FreeDiamonds
             packet.WriteInt(1200);
             packet.WriteInt(60);
-
-            packet.WriteInt(5000/*Home.Trophies*/); // Trophies
-
+            packet.WriteInt(Home.Trophies); // Trophies
             packet.WriteInt(0); // Wins 
             packet.WriteInt(0); // Losses
-
             packet.WriteInt(0); // Defend Wins
             packet.WriteInt(0); // Defend Losses
-
             packet.WriteInt(0); // Clan Castle Gold
             packet.WriteInt(0); // Clan Castle Elixir
             packet.WriteInt(0); // Clan Castle Dark Elixir
-
             packet.WriteInt(0);
             packet.WriteInt(0);
+            //packet.WriteInt(0); //(added in v11)
 
             packet.WriteBoolean(true);
-            packet.WriteInt(220);
-            packet.WriteInt(1828055880);
+            {
+                packet.WriteInt(220);
+                packet.WriteInt(1828055880);
+            }
 
-            packet.WriteByte(1); // NameSetted
+            //packet.WriteByte(0); //(added in v11)
+            //packet.WriteByte(0); //(added in v11)
+
+            packet.WriteInt(1); // NameSetted
             packet.WriteInt(-1); // NameChanged
-
             packet.WriteInt(0);
             packet.WriteInt(0);
-
             packet.WriteInt(0); // WarState
             packet.WriteInt(0); // ShieldCost
-            packet.WriteInt(0);
+            
+            packet.WriteByte(0);
+            {
+            }
 
             packet.WriteByte(0);
+            {
+            }
 
             // Resource Cap
             packet.WriteInt(8);
@@ -181,40 +193,54 @@ namespace ClashofClans.Logic
 
             Home.Resources.Encode(packet);
 
-            packet.WriteInt(0); // Home Troops
-            packet.WriteInt(0); // Spells
-            packet.WriteInt(0); // Home Troop Levels
-            packet.WriteInt(0); // Spell Levels
+            packet.WriteInt(Home.Units.Troops.Count); // Home Troops
+            foreach (Unit troop in Home.Units.Troops)
+            {
+                packet.WriteInt(troop.Id);
+                packet.WriteInt(troop.Count);
+            }
 
-            packet.WriteInt(4); // Hero Levels
-            packet.WriteInt(28000000);
-            packet.WriteInt(44);
-            packet.WriteInt(28000001);
-            packet.WriteInt(44);
-            packet.WriteInt(28000002);
-            packet.WriteInt(19);
-            packet.WriteInt(28000003);
-            packet.WriteInt(29);
+            packet.WriteInt(Home.Units.Troops.Count); // Home Troop Levels
+            foreach (Unit troop in Home.Units.Troops)
+            {
+                packet.WriteInt(troop.Id);
+                packet.WriteInt(troop.Level);
+            }
 
-            packet.WriteInt(4); // Hero Healths
-            packet.WriteInt(28000000);
-            packet.WriteInt(0);
-            packet.WriteInt(28000001);
-            packet.WriteInt(0);
-            packet.WriteInt(28000002);
-            packet.WriteInt(0);
-            packet.WriteInt(28000003);
-            packet.WriteInt(0);
+            packet.WriteInt(Home.Units.Spells.Count);
+            foreach (Unit spell in Home.Units.Spells)
+            {
+                packet.WriteInt(spell.Id);
+                packet.WriteInt(spell.Count);
+            }
 
-            packet.WriteInt(4); // Hero States
-            packet.WriteInt(28000000);
-            packet.WriteInt(3);
-            packet.WriteInt(28000001);
-            packet.WriteInt(3);
-            packet.WriteInt(28000002);
-            packet.WriteInt(3);
-            packet.WriteInt(28000003);
-            packet.WriteInt(2);
+            packet.WriteInt(Home.Units.Spells.Count); // Spell Levels
+            foreach (Unit spell in Home.Units.Spells)
+            {
+                packet.WriteInt(spell.Id);
+                packet.WriteInt(spell.Level);
+            }
+
+            packet.WriteInt(Home.Characters.Heroes.Count);
+            foreach (Hero hero in Home.Characters.Heroes)
+            {
+                packet.WriteInt(hero.Id);
+                packet.WriteInt(hero.Level);
+            }
+
+            packet.WriteInt(Home.Characters.Heroes.Count); //hero health slot data
+            foreach (Hero hero in Home.Characters.Heroes)
+            {
+                packet.WriteInt(hero.Id);
+                packet.WriteInt(hero.Health);
+            }
+
+            packet.WriteInt(Home.Characters.Heroes.Count); //hero state slot data
+            foreach (Hero hero in Home.Characters.Heroes)
+            {
+                packet.WriteInt(hero.Id);
+                packet.WriteInt(3);
+            }
 
             // Clan Units
             packet.WriteInt(0);
@@ -226,7 +252,11 @@ namespace ClashofClans.Logic
             packet.WriteInt(0);
 
             // Tutorials | 10 = Set Name - 35 All tutorials 
-            var mission = Home.NameSet == 0 ? 10 : 35;
+            /*var mission = Home.NameSet == 0 ? 10 : 35;
+            packet.WriteInt(mission);
+            for (var i = 0; i < mission; i++)
+                packet.WriteInt(21000000 + i);*/
+            var mission = 35;
             packet.WriteInt(mission);
             for (var i = 0; i < mission; i++)
                 packet.WriteInt(21000000 + i);
@@ -250,17 +280,104 @@ namespace ClashofClans.Logic
             packet.WriteInt(0);
             packet.WriteInt(0);
             packet.WriteInt(0);
+
             packet.WriteInt(0);
             packet.WriteInt(0);
             packet.WriteInt(0);
+
             packet.WriteInt(0);
-            packet.WriteInt(0);
+
+            packet.WriteInt(1); //unit village2 slot
+            {
+                packet.WriteInt(4000005);
+                packet.WriteInt(4);
+            }
 
             packet.WriteInt(0);
             packet.WriteInt(0);
         }
 
-        /*public async void AddEntry(AvatarStreamEntry entry)
+		public void AvatarRankingEntry(IByteBuffer packet, int order, bool isPrevious = false)
+		{
+			RankingEntry(packet, order, isPrevious);
+
+			packet.WriteInt(Home.ExpLevel);
+			packet.WriteInt(Home.AttacksWon); //attacks won
+			packet.WriteInt(0);
+			packet.WriteInt(Home.DefensesWon); //defenses won
+			packet.WriteInt(0);
+			packet.WriteInt(LeagueUtils.GetLeagueByScore(isPrevious ? Home.PreviousSeasonTrophies : Home.League > 0 ? Home.Trophies : 0));
+
+			packet.WriteScString(Home.PreferredDeviceLanguage);
+			packet.WriteLong(Home.Id);
+
+			packet.WriteInt(0);
+			packet.WriteInt(0);
+
+			AllianceInfo info = Home.AllianceInfo;
+
+			if (info.HasAlliance)
+			{
+				packet.WriteBoolean(true);
+				{
+					packet.WriteLong(info.Id);
+					packet.WriteScString(info.Name);
+					packet.WriteInt(info.Badge);
+				}
+			}
+			else
+			{
+				packet.WriteBoolean(false);
+			}
+		}
+
+		public void LeagueMemberEntry(IByteBuffer packet, int order)
+		{
+			packet.WriteLong(Home.Id);
+			packet.WriteScString(Home.Name);
+			packet.WriteInt(order);
+			packet.WriteInt(Home.Trophies);
+			packet.WriteInt(0);
+			packet.WriteInt(0);
+			packet.WriteInt(Home.AttacksWon); //attacks won
+			packet.WriteInt(0);
+			packet.WriteInt(Home.DefensesWon); //defenses won
+			packet.WriteInt(0);
+
+			packet.WriteLong(Home.Id);
+			packet.WriteLong(Home.Id);
+
+			AllianceInfo info = Home.AllianceInfo;
+
+			if (info.HasAlliance)
+			{
+				packet.WriteBoolean(true);
+				{
+					packet.WriteLong(info.Id);
+					packet.WriteScString(info.Name);
+					packet.WriteInt(info.Badge);
+				}
+			}
+			else
+			{
+				packet.WriteBoolean(false);
+			}
+
+			packet.WriteLong(Home.Id);
+
+		}
+
+		private void RankingEntry(IByteBuffer packet, int order, bool isPrevious = false)
+		{
+			packet.WriteLong(Home.Id);
+			packet.WriteScString(Home.Name);
+
+			packet.WriteInt(order);
+			packet.WriteInt(isPrevious ? Home.PreviousSeasonTrophies : Home.Trophies);
+			packet.WriteInt(200);
+		}
+
+		/*public async void AddEntry(AvatarStreamEntry entry)
         {
             lock (Home.Stream)
             {
@@ -279,38 +396,56 @@ namespace ClashofClans.Logic
             }.SendAsync();
         }*/
 
-        /// <summary>
-        ///     Validates this session
-        /// </summary>
-        public void ValidateSession()
-        {
-            var session = Device.Session;
-            session.Duration = (int) DateTime.UtcNow.Subtract(session.SessionStart).TotalSeconds;
+		/// <summary>
+		///     Validates this session
+		/// </summary>
+		public void ValidateSession()
+		{
+			Session session = Device.Session;
+			session.Duration = (int)DateTime.UtcNow.Subtract(session.SessionStart).TotalSeconds;
 
-            Home.TotalPlayTimeSeconds += session.Duration;
+			Home.TotalPlayTimeSeconds += session.Duration;
 
-            while (Home.Sessions.Count >= 50) Home.Sessions.RemoveAt(0);
+			while (Home.Sessions.Count >= 50) Home.Sessions.RemoveAt(0);
 
-            Home.Sessions.Add(session);
-        }
+			Home.Sessions.Add(session);
+		}
 
-        public async void Save()
-        {
-            Home.LastSaveTime = DateTime.UtcNow;
+		public async void Save()
+		{
+			Home.LastSaveTime = DateTime.UtcNow;
+			/*#if DEBUG
+						var st = new Stopwatch();
+						st.Start();
 
-/*#if DEBUG
-            var st = new Stopwatch();
-            st.Start();
+						Resources.ObjectCache.CachePlayer(this);
+						await PlayerDb.SaveAsync(this);
 
-            Resources.ObjectCache.CachePlayer(this);
-            await PlayerDb.SaveAsync(this);
+						st.Stop();
+						Logger.Log($"Player {Home.Id} saved in {st.ElapsedMilliseconds}ms.", GetType(), ErrorLevel.Debug);
+			#else*/
+			Resources.ObjectCache.CachePlayer(this);
+			await PlayerDb.SaveAsync(this);
+			//#endif
+		}
 
-            st.Stop();
-            Logger.Log($"Player {Home.Id} saved in {st.ElapsedMilliseconds}ms.", GetType(), ErrorLevel.Debug);
-#else*/
-            Resources.ObjectCache.CachePlayer(this);
-            await PlayerDb.SaveAsync(this);
-//#endif
-        }
+		public async void SaveAll()
+		{
+			Home.Status = 0;
+			Home.LastSaveTime = DateTime.UtcNow;
+			/*#if DEBUG
+                        var st = new Stopwatch();
+                        st.Start();
+
+                        Resources.ObjectCache.CachePlayer(this);
+                        await PlayerDb.SaveAsync(this);
+
+                        st.Stop();
+                        Logger.Log($"Player {Home.Id} saved in {st.ElapsedMilliseconds}ms.", GetType(), ErrorLevel.Debug);
+            #else*/
+			Resources.ObjectCache.CachePlayer(this);
+			await PlayerDb.SaveAsync(this);
+			//#endif
+		}
     }
 }

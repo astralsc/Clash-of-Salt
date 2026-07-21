@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ClashofClans.Core;
+using ClashofClans.Core.Leaderboard;
 using ClashofClans.Core.Network;
 using ClashofClans.Database;
 using ClashofClans.Database.Cache;
@@ -20,7 +21,7 @@ namespace ClashofClans
 
         //public static AllianceDb AllianceDb { get; set; }
         public static ObjectCache ObjectCache { get; set; }
-        //public static Leaderboard Leaderboard { get; set; }
+        public static Leaderboard Leaderboard { get; set; }
 
         public static NettyService Netty { get; set; }
 
@@ -61,7 +62,7 @@ namespace ClashofClans
             Players = new Players();
             //Alliances = new Alliances();
 
-            //Leaderboard = new Leaderboard();
+            Leaderboard = new Leaderboard();
 
             StartTime = DateTime.UtcNow;
 

@@ -10,7 +10,7 @@ namespace ClashofClans.Database
 {
     public class AllianceDb
     {
-        private const string Name = "clan";
+        private const string Name = "alliances";
         private static string _connectionString;
         private static long _allianceSeed;
 

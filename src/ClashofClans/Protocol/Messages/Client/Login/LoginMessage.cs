@@ -87,7 +87,10 @@ namespace ClashofClans.Protocol.Messages.Client.Login
 
                 // TESTING:
                 player.Home.FastForward((int) DateTime.UtcNow.Subtract(player.Home.LastSaveTime).TotalSeconds);
-                
+
+                if (player.Home.League != 0)
+                    Resources.Leaderboard.UpdateLeagueMemberList(Device.Player.Home.League);
+
                 await new OwnHomeDataMessage(Device).SendAsync();
                 //await new AvatarStreamMessage(Device).SendAsync();
             }

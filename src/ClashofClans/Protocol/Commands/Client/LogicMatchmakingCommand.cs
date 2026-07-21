@@ -15,7 +15,11 @@ namespace ClashofClans.Protocol.Commands.Client
             Device.CurrentState = Device.State.Battle;
             Device.CurrentBattleType = Device.BattleType.Multiplayer;
 
-            Device.Player.Home.GameMatchmakingManager.Init(Device);
+            //Device.Player.Home.GameMatchmakingManager.Init(Device);
+            await new EnemyHomeDataMessage(Device)
+            {
+                Enemy = Device.Player
+            }.SendAsync();
         }
     }
 }

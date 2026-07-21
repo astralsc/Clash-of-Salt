@@ -13,7 +13,7 @@ namespace ClashofClans.Database
 {
     public class PlayerDb
     {
-        private const string Name = "player";
+        private const string Name = "players";
         private static string _connectionString;
         private static long _playerSeed;
 
@@ -281,22 +281,105 @@ namespace ClashofClans.Database
         {
             #region GetGlobal
 
-            var list = new List<Player>();
+            List<Player> list = new List<Player>();
 
             try
             {
-                using (var connection = new MySqlConnection(_connectionString))
+                using (MySqlConnection connection = new MySqlConnection(_connectionString))
                 {
                     await connection.OpenAsync();
 
-                    using (var cmd = new MySqlCommand($"SELECT * FROM {Name} ORDER BY `Trophies` DESC LIMIT 200",
+                    using (MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {Name} ORDER BY `Trophies` DESC LIMIT 200",
                         connection))
                     {
                         var reader = await cmd.ExecuteReaderAsync();
-
+                        Player player = null;
                         while (await reader.ReadAsync())
-                            list.Add(JsonConvert.DeserializeObject<Player>((string)reader["Home"],
-                                Configuration.JsonSettings));
+                            list.Add(player = new Player
+                            {
+                                Home = JsonConvert.DeserializeObject<Home>((string)reader["Home"],
+                                    Configuration.JsonSettings)
+                            });
+                    }
+
+                    await connection.CloseAsync();
+                }
+
+                return list;
+            }
+            catch (Exception exception)
+            {
+                Logger.Log(exception, null, Logger.ErrorLevel.Error);
+
+                return list;
+            }
+
+            #endregion
+        }
+
+        public static async Task<List<Player>> GetLeagueMemberListAsync(int league)
+        {
+            #region LeagueMember
+
+            List<Player> list = new List<Player>();
+
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {Name} WHERE `Trophies` BETWEEN {LeagueUtils.GetPlacementLimitLow(league)} AND {LeagueUtils.GetPlacementLimitHigh(league)} ORDER BY `Trophies` DESC LIMIT 200",
+                        connection))
+                    {
+                        var reader = await cmd.ExecuteReaderAsync();
+                        Player player = null;
+                        while (await reader.ReadAsync())
+                            list.Add(player = new Player
+                            {
+                                Home = JsonConvert.DeserializeObject<Home>((string)reader["Home"],
+                                    Configuration.JsonSettings)
+                            });
+                    }
+
+                    await connection.CloseAsync();
+                }
+
+                return list;
+            }
+            catch (Exception exception)
+            {
+                Logger.Log(exception, null, Logger.ErrorLevel.Error);
+
+                return list;
+            }
+
+            #endregion
+        }
+
+        public static async Task<List<Player>> GetPreviousSeasonGlobalPlayerRankingAsync()
+        {
+            #region GetPreviousGlobal
+
+            List<Player> list = new List<Player>();
+
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {Name} WHERE `PreviousSeasonMonth` <=> {DateTime.Now.Month - 1} ORDER BY `PreviousSeasonTrophies` DESC LIMIT 200",
+                        connection))
+                    {
+                        var reader = await cmd.ExecuteReaderAsync();
+                        Player player = null;
+                        while (await reader.ReadAsync())
+                            list.Add(player = new Player
+                            {
+                                Home = JsonConvert.DeserializeObject<Home>((string)reader["Home"],
+                                    Configuration.JsonSettings)
+                            });
                     }
 
                     await connection.CloseAsync();
@@ -318,63 +401,28 @@ namespace ClashofClans.Database
         {
             #region GetLocal
 
-            var list = new List<Player>();
+            List<Player> list = new List<Player>();
 
             try
             {
-                using (var connection = new MySqlConnection(_connectionString))
+                using (MySqlConnection connection = new MySqlConnection(_connectionString))
                 {
                     await connection.OpenAsync();
 
-                    using (var cmd =
+                    using (MySqlCommand cmd =
                         new MySqlCommand(
                             $"SELECT * FROM {Name} WHERE Language = '{language}' ORDER BY `Trophies` DESC LIMIT 200",
                             connection))
                     {
                         var reader = await cmd.ExecuteReaderAsync();
 
+                        Player player = null;
                         while (await reader.ReadAsync())
-                            list.Add(JsonConvert.DeserializeObject<Player>((string)reader["Home"],
-                                Configuration.JsonSettings));
-                    }
-
-                    await connection.CloseAsync();
-                }
-
-                return list;
-            }
-            catch (Exception exception)
-            {
-                Logger.Log(exception, null, Logger.ErrorLevel.Error);
-
-                return list;
-            }
-
-            #endregion
-        }
-
-        public static async Task<List<Player>> GetSeasonPlayerRankingAsync(long month)
-        {
-            #region GetSeason
-
-            var list = new List<Player>();
-
-            try
-            {
-                using (var connection = new MySqlConnection(_connectionString))
-                {
-                    await connection.OpenAsync();
-
-                    using (var cmd =
-                        new MySqlCommand(
-                            $"SELECT * FROM {Name} WHERE PreviousSeasonMonth = '{month}' ORDER BY `PreviousSeasonTrophies` DESC LIMIT 200",
-                            connection))
-                    {
-                        var reader = await cmd.ExecuteReaderAsync();
-
-                        while (await reader.ReadAsync())
-                            list.Add(JsonConvert.DeserializeObject<Player>((string)reader["Home"],
-                                Configuration.JsonSettings));
+                            list.Add(player = new Player
+                            {
+                                Home = JsonConvert.DeserializeObject<Home>((string)reader["Home"],
+                                    Configuration.JsonSettings)
+                            });
                     }
 
                     await connection.CloseAsync();
@@ -418,7 +466,8 @@ namespace ClashofClans.Database
                         maxTrophies = player.Home.Trophies + 600;
                     }
 
-                    using (MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {Name} WHERE Id != '{player.Home.Id}' AND IsOnline = '0' AND Trophies BETWEEN '{minTrophies}' AND '{maxTrophies}' ORDER BY RAND() LIMIT 1", connection))
+                    //using (MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {Name} WHERE Id != '{player.Home.Id}' AND IsOnline = '0' AND Trophies BETWEEN '{minTrophies}' AND '{maxTrophies}' ORDER BY RAND() LIMIT 1", connection))
+                    using (MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {Name} WHERE Id != '{player.Home.Id}' AND Trophies BETWEEN '{minTrophies}' AND '{maxTrophies}' ORDER BY RAND() LIMIT 1", connection))
                     {
                         var reader = await cmd.ExecuteReaderAsync();
 

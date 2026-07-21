@@ -20,8 +20,7 @@ namespace ClashofClans.Protocol.Messages.Server.Battle
             Enemy.Home.Tick();
 
             Writer.WriteInt(10);
-            Writer.WriteInt(0);
-            Writer.WriteInt(TimeUtils.CurrentUnixTimestamp);
+            Writer.WriteInt(-1);
 
             Enemy.LogicClientHome(Writer);
             Enemy.LogicClientAvatar(Writer);

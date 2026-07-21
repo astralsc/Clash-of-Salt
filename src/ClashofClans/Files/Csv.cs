@@ -24,6 +24,7 @@ namespace ClashofClans.Files
             Gamefiles.Add("GameAssets/logic/resources.csv");
             Gamefiles.Add("GameAssets/logic/npcs.csv");
             Gamefiles.Add("GameAssets/logic/leagues.csv");
+            Gamefiles.Add("GameAssets/logic/regions.csv");
 
             Tables = new Gamefiles();
 

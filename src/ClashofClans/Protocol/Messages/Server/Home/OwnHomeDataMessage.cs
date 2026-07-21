@@ -24,14 +24,14 @@ namespace ClashofClans.Protocol.Messages.Server
             player.LogicClientHome(Writer);
             player.LogicClientAvatar(Writer);
 
-            Writer.WriteInt(0); // MapId
+            /*Writer.WriteInt(0); // MapId
             Writer.WriteInt(0); // LayoudId
 
 			Writer.WriteLong(0);
 			Writer.WriteLong(0);
 			Writer.WriteLong(0);
 
-			Writer.WriteInt(0); // ReengagementSeconds
+			Writer.WriteInt(0); // ReengagementSeconds*/
         }
     }
 }

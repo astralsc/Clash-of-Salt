@@ -4,6 +4,7 @@ using ClashofClans.Protocol.Messages.Client;
 using ClashofClans.Protocol.Messages.Client.Alliance;
 using ClashofClans.Protocol.Messages.Client.Home;
 using ClashofClans.Protocol.Messages.Client.Login;
+using ClashofClans.Protocol.Messages.Client.Scoring;
 
 namespace ClashofClans.Protocol
 {
@@ -24,11 +25,12 @@ namespace ClashofClans.Protocol
                 {10936, typeof(GoHomeMessage)},
                 {11186, typeof(AskForAllianceDataMessage)},
                 {11734, typeof(AskForAvatarProfileMessage)},
+                {12461, typeof(AskForLastAvatarTournamentResultsMessage)},
+                {12865, typeof(AskForAllianceRankingListMessage)},
                 {12906, typeof(EndClientTurnMessage)},
-                // 13708 - Contains a key
-                /*{14401, typeof(AskForAllianceRankingListMessage)},
-                {14403, typeof(AskForAvatarRankingListMessage)},
-                {14404, typeof(AskForAvatarLocalRankingListMessage)},*/
+                {13586, typeof(AskForLeagueMemberListMessage)},
+                {13723, typeof(AskForAvatarLocalRankingListMessage)},
+                {14359, typeof(AskForAvatarRankingListMessage)},
                 {14466, typeof(ChatToAllianceStreamMessage)},
                 {15718, typeof(AttackNpcMessage)},
                 {16203, typeof(DebugEventMessage)},

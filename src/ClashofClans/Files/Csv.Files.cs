@@ -22,7 +22,8 @@ namespace ClashofClans.Files
             Achievements = 10,
             Resources = 11,
             Npcs = 12,
-            Leagues = 13
+            Leagues = 13,
+            Regions = 14
         }
 
         public static Dictionary<Files, Type> DataTypes = new Dictionary<Files, Type>();
@@ -42,6 +43,7 @@ namespace ClashofClans.Files
             DataTypes.Add(Files.Resources, typeof(Logic.Resources));
             DataTypes.Add(Files.Npcs, typeof(Npcs));
             DataTypes.Add(Files.Leagues, typeof(Leagues));
+            DataTypes.Add(Files.Regions, typeof(Regions));
         }
 
         public static Data Create(Files file, Row row, DataTable dataTable)
