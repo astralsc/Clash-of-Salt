@@ -59,6 +59,17 @@ namespace ClashofClans.Logic.Manager.Items.GameObjects
 			ConstructionTimer = null;
 		}
 
+		public void SpeedUpConstruction()
+		{
+			if (ConstructionTimer == null) return;
+			int cost = 0;
+
+			if (Home.UseDiamonds(cost))
+				FinishConstruction();
+			else
+				Logger.Log("Payment failed.", GetType(), Logger.ErrorLevel.Warning);
+		}
+
 		public override void Load(JObject jObject)
 		{
 			base.Load(jObject);

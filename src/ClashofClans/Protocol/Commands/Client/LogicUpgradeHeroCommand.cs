@@ -21,8 +21,8 @@ namespace ClashofClans.Protocol.Commands.Client
 		{
 			BuildingId = Reader.ReadInt();
 
-			Reader.ReadInt();
-			Reader.ReadInt();
+			/*Reader.ReadInt();
+			Reader.ReadInt();*/
 		}
 		public override void Process()
 		{

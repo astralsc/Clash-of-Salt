@@ -13,9 +13,9 @@ namespace ClashofClans.Protocol.Messages.Client
 
         public override void Decode()
         {
-            Reader.ReadByte(); // 4
+            /*Reader.ReadByte(); // 4
             Reader.ReadInt(); // 2
-            Reader.ReadInt(); // 0
+            Reader.ReadInt(); // 0*/
         }
 
         public override async void Process()

@@ -51,11 +51,11 @@ namespace ClashofClans.Protocol.Commands.Client
                 for (var i = 0; i < count; i++)
                     cost *= 2;
             }
-            else if (BuildingData == 1000042) // Troophousing 2
+            /*else if (BuildingData == 1000042) // Troophousing 2
             {
                 Device.Disconnect("Troophousing2 can't be bought yet.");
                 return;
-            }
+            }*/
 
             if (home.UseResourceByName(building.BuildingData.BuildResource, cost))
             {

@@ -14,6 +14,7 @@ namespace ClashofClans.Protocol.Messages.Server.Battle
         }
 
         public Player Enemy { get; set; }
+        public bool NextButton { get; set; }
 
         public override void Encode()
         {
@@ -27,7 +28,7 @@ namespace ClashofClans.Protocol.Messages.Server.Battle
 
             Device.Player.LogicClientAvatar(Writer);
 
-            Writer.WriteInt(3);
+            Writer.WriteInt(NextButton ? 3 : 2); // NextButton (2 = Disabled, 3 = Enabled)
             Writer.WriteInt(0);
             Writer.WriteByte(0);
         }

@@ -12,8 +12,12 @@ namespace ClashofClans.Protocol.Commands.Client
 		private int UnitId { get; set; }
 		public override void Decode()
 		{
-			Reader.ReadInt();
+			Reader.ReadInt(); // X
+			Reader.ReadInt(); // Y
 			UnitId = Reader.ReadInt();
+
+			/*Reader.ReadInt();
+			UnitId = Reader.ReadInt();*/
 			/*Reader.ReadVInt();
 			Reader.ReadVInt();
 			Reader.ReadBoolean();*/

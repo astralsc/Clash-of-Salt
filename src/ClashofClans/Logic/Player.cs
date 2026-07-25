@@ -287,10 +287,11 @@ namespace ClashofClans.Logic
 
             packet.WriteInt(0);
 
-            packet.WriteInt(1); //unit village2 slot
+            packet.WriteInt(Home.Units.TroopsV2.Count); // Home Village 2 Troops
+            foreach (Unit troop in Home.Units.TroopsV2)
             {
-                packet.WriteInt(4000005);
-                packet.WriteInt(4);
+                packet.WriteInt(troop.Id);
+                packet.WriteInt(troop.Count);
             }
 
             packet.WriteInt(0);

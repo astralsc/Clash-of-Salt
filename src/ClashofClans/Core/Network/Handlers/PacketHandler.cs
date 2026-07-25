@@ -51,13 +51,25 @@ namespace ClashofClans.Core.Network.Handlers
         {
             if (Device?.Player?.Home != null)
             {
-                var player = await Resources.Players.GetPlayerAsync(Device.Player.Home.Id, true);
+                Player player = await Resources.Players.GetPlayerAsync(Device.Player.Home.Id, true);
                 if (player != null)
+                {
+                    player.Home.Status = 0;
+
+                    if (player.Home.GameMatchmakingManager.searchTimer != null)
+                    {
+                        player.Home.GameMatchmakingManager.searchTimer.Stop();
+                    }
+
+                    if (Device.Player.Home.Battle.GetBattleStatus())
+                        Device.Player.Home.Battle.EndBattle(Device.Player, Device);
+
                     if (player.Device.Session.SessionId == Device.Session.SessionId)
                         Resources.Players.LogoutById(player.Home.Id);
+                }
             }
 
-            var remoteAddress = (IPEndPoint) Channel.RemoteAddress;
+            IPEndPoint remoteAddress = (IPEndPoint)Channel.RemoteAddress;
 
             Logger.Log($"Client {remoteAddress.Address.MapToIPv4()}:{remoteAddress.Port} disconnected.", GetType(),
                 Logger.ErrorLevel.Debug);

@@ -44,7 +44,7 @@ namespace ClashofClans.Logic
 				Player enemy = GetEnemyData();
 
 				int attackerScore = player.Home.Trophies;
-				int defenderScore = enemy.Home.Trophies;
+				int defenderScore = enemy?.Home?.Trophies ?? 0;
 
 				int multiplier = GetBattleStars();
 
@@ -107,26 +107,26 @@ namespace ClashofClans.Logic
 				newDefenderScore = LogicMath.Max(defenderScore + defenderGainCount, 0);
 
 				player.Home.Trophies = newAttackerScore;
-				enemy.Home.Trophies = newDefenderScore;
+				if (enemy?.Home != null) enemy.Home.Trophies = newDefenderScore;
 
 				if (GetBattleStars() > 0)
 				{
 					SetBattleWin(player);
-					SetBattleLose(enemy, false);
+					if (enemy?.Home != null) SetBattleLose(enemy, false);
 					player.Home.AttacksWon++;
 				}
 				else
 				{
 					SetBattleLose(player);
-					SetBattleWin(enemy);
-					enemy.Home.DefensesWon++;
+					if (enemy?.Home != null) SetBattleWin(enemy);
+					if (enemy?.Home != null) enemy.Home.DefensesWon++;
 				}
 
-				await Database.PlayerDb.SaveAsync(enemy);
+				if (enemy?.Home != null) await Database.PlayerDb.SaveAsync(enemy);
 
-				enemy.Save();
+				if (enemy?.Home != null) enemy.Save();
 
-				Logger.Log($"The battle is over. Attacker id: {player.Home.Id}, attacker name: {player.Home.Name}, defender id: {enemy.Home.Id}, defender name: {enemy.Home.Name}, percentage: {GetBattlePercenatage() + "%"}, stars: {GetBattleStars()}, trophies won: {newAttackerScore - attackerScore}", null, Logger.ErrorLevel.Debug);
+				if (enemy?.Home != null) Logger.Log($"The battle is over. Attacker id: {player.Home.Id}, attacker name: {player.Home.Name}, defender id: {enemy.Home.Id}, defender name: {enemy.Home.Name}, percentage: {GetBattlePercenatage() + "%"}, stars: {GetBattleStars()}, trophies won: {newAttackerScore - attackerScore}", null, Logger.ErrorLevel.Debug);
 
 				Destruct();
 			}

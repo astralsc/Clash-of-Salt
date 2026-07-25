@@ -4,9 +4,9 @@ using DotNetty.Buffers;
 
 namespace ClashofClans.Protocol.Commands.Client
 {
-    public class LogicMatchmakingCommand : LogicCommand
+    public class LogicMatchmakingVillage2Command : LogicCommand
     {
-        public LogicMatchmakingCommand(Device device, IByteBuffer buffer) : base(device, buffer)
+        public LogicMatchmakingVillage2Command(Device device, IByteBuffer buffer) : base(device, buffer)
         {
         }
 
@@ -15,7 +15,7 @@ namespace ClashofClans.Protocol.Commands.Client
             Device.CurrentState = Device.State.Battle;
             Device.CurrentBattleType = Device.BattleType.Multiplayer;
 
-            Device.Player.Home.GameMatchmakingManager.Init(Device);
+            Device.Player.Home.GameMatchmakingManager.InitV2(Device);
         }
     }
 }

@@ -466,8 +466,7 @@ namespace ClashofClans.Database
                         maxTrophies = player.Home.Trophies + 600;
                     }
 
-                    //using (MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {Name} WHERE Id != '{player.Home.Id}' AND IsOnline = '0' AND Trophies BETWEEN '{minTrophies}' AND '{maxTrophies}' ORDER BY RAND() LIMIT 1", connection))
-                    using (MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {Name} WHERE Id != '{player.Home.Id}' AND Trophies BETWEEN '{minTrophies}' AND '{maxTrophies}' ORDER BY RAND() LIMIT 1", connection))
+                    using (MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {Name} WHERE Id != '{player.Home.Id}' AND IsOnline = '0' AND Trophies BETWEEN '{minTrophies}' AND '{maxTrophies}' ORDER BY RAND() LIMIT 1", connection))
                     {
                         var reader = await cmd.ExecuteReaderAsync();
 

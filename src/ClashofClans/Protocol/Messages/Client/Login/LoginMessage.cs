@@ -68,6 +68,8 @@ namespace ClashofClans.Protocol.Messages.Client.Login
                 Device.Player = player;
                 player.Device = Device;
 
+                player.Home.Status = 1;
+
                 await new LoginOkMessage(Device).SendAsync();
 
                 var ip = Device.GetIp();

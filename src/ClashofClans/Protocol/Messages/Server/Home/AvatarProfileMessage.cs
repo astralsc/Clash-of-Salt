@@ -24,10 +24,9 @@ namespace ClashofClans.Protocol.Messages.Server
             Writer.WriteInt(0);
             Writer.WriteInt(0);
             Writer.WriteInt(0);
-            Writer.WriteInt(0);
 
-            Writer.WriteBoolean(false);
             Writer.WriteInt(0);
+            Writer.WriteBoolean(false);
         }
     }
 }
