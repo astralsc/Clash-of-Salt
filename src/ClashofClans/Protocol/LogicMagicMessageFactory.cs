@@ -18,7 +18,7 @@ namespace ClashofClans.Protocol
             {
                 {10100, typeof(ClientHelloMessage)},
                 {10101, typeof(LoginMessage)},
-                {12031, typeof(KeepAliveMessage)},
+                {10108, typeof(KeepAliveMessage)},
                 //{10113, typeof(SetDeviceTokenMessage)},
                 {10601, typeof(SendGlobalChatLineMessage)},
                 /*{10905, typeof(NewsSeenMessage)},*/
