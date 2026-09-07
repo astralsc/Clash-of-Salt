@@ -146,7 +146,7 @@ namespace ClashofClans.Logic
             packet.WriteInt(0); // Clan Castle Dark Elixir
             packet.WriteInt(0);
             packet.WriteInt(0);
-            //packet.WriteInt(0); //(added in v11)
+            packet.WriteInt(0); //(added in v11)
 
             packet.WriteBoolean(true);
             {
@@ -154,8 +154,8 @@ namespace ClashofClans.Logic
                 packet.WriteInt(1828055880);
             }
 
-            //packet.WriteByte(0); //(added in v11)
-            //packet.WriteByte(0); //(added in v11)
+            packet.WriteByte(0); //(added in v11)
+            packet.WriteByte(0); //(added in v11)
 
             packet.WriteInt(1); // NameSetted
             packet.WriteInt(-1); // NameChanged
