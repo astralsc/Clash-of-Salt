@@ -7,7 +7,7 @@ namespace ClashofClans.Protocol.Messages.Server
     {
         public KeepAliveServerMessage(Device device) : base(device)
         {
-            Id = 20108;
+            Id = 28663;
         }
 
         public override void Encode()
