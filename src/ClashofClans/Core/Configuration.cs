@@ -17,12 +17,12 @@ namespace ClashofClans.Core
         };
 
         [JsonProperty("mysql_database")] public string MySqlDatabase = "cosdb";
-        [JsonProperty("mysql_password")] public string MySqlPassword = "root";
+        [JsonProperty("mysql_password")] public string MySqlPassword = "";
         [JsonProperty("mysql_server")] public string MySqlServer = "127.0.0.1";
         [JsonProperty("mysql_user")] public string MySqlUserId = "root";
 
         [JsonProperty("server_port")] public int ServerPort = 9339;
-        [JsonProperty("update_url")] public string UpdateUrl = "https://github.com/astralsc/CoS-10.322";
+        [JsonProperty("update_url")] public string UpdateUrl = "https://github.com/astralsc/Clash-of-Salt";
 
         /// <summary>
         ///     Loads the configuration
