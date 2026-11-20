@@ -17,7 +17,7 @@ namespace ClashofClans.Core
         };
 
         [JsonProperty("mysql_database")] public string MySqlDatabase = "cosdb";
-        [JsonProperty("mysql_password")] public string MySqlPassword = "root";
+        [JsonProperty("mysql_password")] public string MySqlPassword = "";
         [JsonProperty("mysql_server")] public string MySqlServer = "127.0.0.1";
         [JsonProperty("mysql_user")] public string MySqlUserId = "root";
 
