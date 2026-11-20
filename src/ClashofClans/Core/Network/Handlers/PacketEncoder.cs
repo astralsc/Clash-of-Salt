@@ -14,18 +14,18 @@ namespace ClashofClans.Core.Network.Handlers
 
             message.Encode();
 
-            var header = PooledByteBufferAllocator.Default.Buffer(7);
-            header.WriteUnsignedShort(message.Id);
-            header.WriteMedium(message.Writer.ReadableBytes);
-            header.WriteUnsignedShort(message.Version);
+            var payload = new byte[message.Writer.ReadableBytes];
+            message.Writer.GetBytes(message.Writer.ReaderIndex, payload);
+            payload = message.Device.Cipher.Encrypt(payload, message.Id);
 
-            base.WriteAsync(context, header);
-            base.WriteAsync(context, message.Writer);
+            var frame = PooledByteBufferAllocator.Default.Buffer(14 + payload.Length);
+            frame.WriteUnsignedShort(message.Id);
+            frame.WriteMedium(payload.Length);
+            frame.WriteUnsignedShort(message.Version);
+            frame.WriteBytes(payload);
+            frame.WriteHex("FFFF0000000000");
 
-            var cb = PooledByteBufferAllocator.Default.Buffer(8);
-            cb.WriteHex("FFFF0000000000");
-
-            return base.WriteAsync(context, cb);
+            return base.WriteAsync(context, frame);
         }
     }
 }

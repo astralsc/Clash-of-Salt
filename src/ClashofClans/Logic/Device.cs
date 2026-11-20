@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
+using ClashofClans.Core.Network;
 using ClashofClans.Core.Network.Handlers;
 using ClashofClans.Logic.Sessions;
 using ClashofClans.Protocol;
@@ -15,6 +17,7 @@ namespace ClashofClans.Logic
         {
             Handler = handler;
             CurrentState = State.Disconnected;
+            Cipher = new PacketCipher(Resources.Configuration.Encryption);
         }
 
         public bool IsConnected => Handler.Channel.Registered;
@@ -44,6 +47,7 @@ namespace ClashofClans.Logic
             if (!(Activator.CreateInstance(LogicMagicMessageFactory.Messages[id], this, buffer) is PiranhaMessage
                 message)) return;
 
+            IByteBuffer decryptedBuffer = null;
             try
             {
                 if (message.RequiredState != CurrentState && message.RequiredState != State.NotDefinied)
@@ -57,6 +61,17 @@ namespace ClashofClans.Logic
                 message.Id = id;
                 message.Length = length;
                 message.Version = version;
+
+                if (Cipher.Mode != PacketCipherMode.None)
+                {
+                    if (length > buffer.ReadableBytes)
+                        throw new InvalidDataException($"Packet {id} has an invalid encrypted payload length.");
+
+                    var encrypted = new byte[length];
+                    buffer.GetBytes(buffer.ReaderIndex, encrypted);
+                    decryptedBuffer = Unpooled.WrappedBuffer(Cipher.Decrypt(encrypted, id));
+                    message.Reader = decryptedBuffer;
+                }
 
 #if DEBUG
                 var st = new Stopwatch();
@@ -78,6 +93,10 @@ namespace ClashofClans.Logic
             catch (Exception exception)
             {
                 Logger.Log($"Failed to process {id}, L: {length}: " + exception, GetType(), Logger.ErrorLevel.Error);
+            }
+            finally
+            {
+                decryptedBuffer?.Release();
             }
         }
 
@@ -122,6 +141,7 @@ namespace ClashofClans.Logic
 
         public Session Session = new Session();
         public PacketHandler Handler { get; set; }
+        public PacketCipher Cipher { get; }
 
         public Player Player { get; set; }
 

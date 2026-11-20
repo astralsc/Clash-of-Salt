@@ -43,7 +43,18 @@ namespace ClashofClans.Protocol.Messages.Client.Login
 
             Reader.ReadInt();
 
-            PreferredDeviceLanguage = Reader.ReadScString().Substring(3, 2); // Language
+            var deviceLanguage = Reader.ReadScString();
+            if (deviceLanguage.Length >= 5)
+                PreferredDeviceLanguage = deviceLanguage.Substring(3, 2);
+            else if (deviceLanguage.Length == 2)
+                PreferredDeviceLanguage = deviceLanguage.ToUpperInvariant();
+            else
+            {
+                PreferredDeviceLanguage = "EN";
+                Logger.Log("Login message has no valid preferred device language; defaulting to EN.",
+                    GetType(), Logger.ErrorLevel.Warning);
+            }
+
             Reader.ReadScString();
             Reader.ReadScString(); // 10
 

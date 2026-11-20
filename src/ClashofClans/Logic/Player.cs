@@ -1,13 +1,14 @@
-﻿using System;
-using ClashofClans.Database;
+﻿using ClashofClans.Database;
+using ClashofClans.Files.CsvUtils;
+using ClashofClans.Logic.Clan;
+using ClashofClans.Logic.Manager.Items;
+using ClashofClans.Logic.Sessions;
 using ClashofClans.Utilities.Netty;
 using ClashofClans.Utilities.Utils;
 using DotNetty.Buffers;
 using Newtonsoft.Json;
-using ClashofClans.Logic.Manager.Items;
-using ClashofClans.Files.CsvUtils;
-using ClashofClans.Logic.Clan;
-using ClashofClans.Logic.Sessions;
+using System;
+using System.Text;
 
 namespace ClashofClans.Logic
 {
@@ -39,16 +40,14 @@ namespace ClashofClans.Logic
             // Home Id
             packet.WriteLong(Home.Id);
 
-            packet.WriteInt(0); // Shield
-            packet.WriteInt(0); // Protection
-
-            packet.WriteInt(0);
+            packet.WriteInt(0); // ShieldDurationSeconds
+            packet.WriteInt(0); // GuardDurationSeconds
+            packet.WriteInt(0); // PersonalBreakSeconds
 
             packet.WriteCompressedString(Home.GameObjectManager.Save());
-
             packet.WriteCompressedString("{\"event\":[]}");
             //packet.WriteCompressedString("{\"Village2\":{\"TownHallMaxLevel\":5}}");
-            packet.WriteCompressedString("{\"Village2\":{\"TownHallMaxLevel\":9,\"ScoreChangeForLosing\":[{\"Milestone\":0,\"Percentage\":0},{\"Milestone\":400,\"Percentage\":30},{\"Milestone\":800,\"Percentage\":55},{\"Milestone\":1200,\"Percentage\":70},{\"Milestone\":1600,\"Percentage\":85},{\"Milestone\":2000,\"Percentage\":95},{\"Milestone\":2400,\"Percentage\":100}],\"StrengthRangeForScore\":[{\"Milestone\":0,\"Percentage\":60},{\"Milestone\":200,\"Percentage\":80},{\"Milestone\":400,\"Percentage\":100},{\"Milestone\":600,\"Percentage\":120},{\"Milestone\":800,\"Percentage\":140},{\"Milestone\":1000,\"Percentage\":160},{\"Milestone\":1200,\"Percentage\":180},{\"Milestone\":1400,\"Percentage\":200},{\"Milestone\":1600,\"Percentage\":400},{\"Milestone\":1800,\"Percentage\":600},{\"Milestone\":2000,\"Percentage\":1000}]},\"KillSwitches\":{\"TestValue\":true}}");
+            // packet.WriteCompressedString("{\"Village2\":{\"TownHallMaxLevel\":9,\"ScoreChangeForLosing\":[{\"Milestone\":0,\"Percentage\":0},{\"Milestone\":400,\"Percentage\":30},{\"Milestone\":800,\"Percentage\":55},{\"Milestone\":1200,\"Percentage\":70},{\"Milestone\":1600,\"Percentage\":85},{\"Milestone\":2000,\"Percentage\":95},{\"Milestone\":2400,\"Percentage\":100}],\"StrengthRangeForScore\":[{\"Milestone\":0,\"Percentage\":60},{\"Milestone\":200,\"Percentage\":80},{\"Milestone\":400,\"Percentage\":100},{\"Milestone\":600,\"Percentage\":120},{\"Milestone\":800,\"Percentage\":140},{\"Milestone\":1000,\"Percentage\":160},{\"Milestone\":1200,\"Percentage\":180},{\"Milestone\":1400,\"Percentage\":200},{\"Milestone\":1600,\"Percentage\":400},{\"Milestone\":1800,\"Percentage\":600},{\"Milestone\":2000,\"Percentage\":1000}]},\"KillSwitches\":{\"TestValue\":true}}");
         }
 
         public void LogicClientAvatar(IByteBuffer packet)
@@ -70,110 +69,59 @@ namespace ClashofClans.Logic
             packet.WriteLong(Home.Id); // AccountId
             packet.WriteLong(Home.Id); // HomeId
 
-            packet.WriteBoolean(true); // HasAlliance
+            var alliance = Home.AllianceInfo;
+            packet.WriteBoolean(alliance.HasAlliance);
+            if (alliance.HasAlliance)
             {
-                packet.WriteLong(1);
-                packet.WriteScString("Clashers"); // Name
-                packet.WriteInt(1); // Badge
-                packet.WriteInt(1); // Role
-                packet.WriteInt(0); // Level
+                packet.WriteLong(alliance.Id);
+                packet.WriteScString(alliance.Name);
+                packet.WriteInt(alliance.Badge);
+                packet.WriteInt(alliance.Role);
+                packet.WriteInt(alliance.Level);
             }
 
-            packet.WriteBoolean(Home.League != 0); // LeagueBool
-            if (Home.League != 0)
-                packet.WriteLong(Home.League); // League
+            packet.WriteBoolean(false);
+            for (var i = 0; i < 11; i++)
+                packet.WriteInt(0);
+            packet.WriteInt(Home.League);
 
+            packet.WriteInt(0); // AllianceCastleLevel
+            packet.WriteInt(10); // AllianceCastleTotalCapacity
+            packet.WriteInt(0); // AllianceCastleUsedCapacity
             packet.WriteInt(0);
-            packet.WriteInt(1);
-
-            {
-                packet.WriteInt(0);
-                packet.WriteInt(1000);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-            }
-            {
-                packet.WriteInt(0);
-                packet.WriteInt(1000);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-                packet.WriteInt(0);
-            }
-
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(Home.League); // League
-
-            packet.WriteInt(0);
-            packet.WriteInt(10);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(Home.GameObjectManager.GetTownhallLevel()); // TownhallLevel
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
+            packet.WriteInt(-1);
+            packet.WriteInt(Home.GameObjectManager.GetTownhallLevel());
 
             packet.WriteScString(Home.Name); // Name
-            packet.WriteScString(null); // FacebookId
+            packet.WriteScString(Home.FacebookId);
             packet.WriteInt(Home.ExpLevel); // ExpLevel
             packet.WriteInt(Home.ExpPoints); // ExpPoints
             packet.WriteInt(Home.Diamonds); // Diamonds
             packet.WriteInt(Home.Diamonds); // FreeDiamonds
-            packet.WriteInt(1200);
-            packet.WriteInt(60);
+            packet.WriteInt(1200); // AttackRating
+            packet.WriteInt(60); // AttackKFactor
             packet.WriteInt(Home.Trophies); // Trophies
-            packet.WriteInt(0); // Wins 
-            packet.WriteInt(0); // Losses
-            packet.WriteInt(0); // Defend Wins
-            packet.WriteInt(0); // Defend Losses
-            packet.WriteInt(0); // Clan Castle Gold
-            packet.WriteInt(0); // Clan Castle Elixir
-            packet.WriteInt(0); // Clan Castle Dark Elixir
+            packet.WriteInt(Home.AttacksWon);
+            packet.WriteInt(0); // Donated units
+            packet.WriteInt(0); // Attack losses
+            packet.WriteInt(0); // Received units
+            packet.WriteInt(0); // Alliance gold
+            packet.WriteInt(0); // Alliance elixir
+            packet.WriteInt(0); // Alliance dark elixir
             packet.WriteInt(0);
-            packet.WriteInt(0);
-            //packet.WriteInt(0); //(added in v11)
-
             packet.WriteBoolean(true);
-            {
-                packet.WriteInt(220);
-                packet.WriteInt(1828055880);
-            }
+            packet.WriteLong(946720861000);
 
-            //packet.WriteByte(0); //(added in v11)
-            //packet.WriteByte(0); //(added in v11)
-
-            packet.WriteInt(1); // NameSetted
-            packet.WriteInt(-1); // NameChanged
+            packet.WriteByte((byte)(Home.NameSet == 0 ? 0 : 1));
             packet.WriteInt(0);
             packet.WriteInt(0);
-            packet.WriteInt(0); // WarState
-            packet.WriteInt(0); // ShieldCost
-            
+            packet.WriteInt(0);
+            packet.WriteInt(1); // War preference
+            packet.WriteInt(0);
+            packet.WriteInt(0);
             packet.WriteByte(0);
-            {
-            }
 
-            packet.WriteByte(0);
-            {
-            }
-
-            // Resource Cap
-            packet.WriteInt(8);
+            packet.WriteInt(8); // Resource caps
             packet.WriteInt(3000001);
             packet.WriteInt(8500000);
             packet.WriteInt(3000002);
@@ -193,18 +141,11 @@ namespace ClashofClans.Logic
 
             Home.Resources.Encode(packet);
 
-            packet.WriteInt(Home.Units.Troops.Count); // Home Troops
+            packet.WriteInt(Home.Units.Troops.Count);
             foreach (Unit troop in Home.Units.Troops)
             {
                 packet.WriteInt(troop.Id);
                 packet.WriteInt(troop.Count);
-            }
-
-            packet.WriteInt(Home.Units.Troops.Count); // Home Troop Levels
-            foreach (Unit troop in Home.Units.Troops)
-            {
-                packet.WriteInt(troop.Id);
-                packet.WriteInt(troop.Level);
             }
 
             packet.WriteInt(Home.Units.Spells.Count);
@@ -214,7 +155,14 @@ namespace ClashofClans.Logic
                 packet.WriteInt(spell.Count);
             }
 
-            packet.WriteInt(Home.Units.Spells.Count); // Spell Levels
+            packet.WriteInt(Home.Units.Troops.Count);
+            foreach (Unit troop in Home.Units.Troops)
+            {
+                packet.WriteInt(troop.Id);
+                packet.WriteInt(troop.Level);
+            }
+
+            packet.WriteInt(Home.Units.Spells.Count);
             foreach (Unit spell in Home.Units.Spells)
             {
                 packet.WriteInt(spell.Id);
@@ -228,77 +176,48 @@ namespace ClashofClans.Logic
                 packet.WriteInt(hero.Level);
             }
 
-            packet.WriteInt(Home.Characters.Heroes.Count); //hero health slot data
+            packet.WriteInt(Home.Characters.Heroes.Count);
             foreach (Hero hero in Home.Characters.Heroes)
             {
                 packet.WriteInt(hero.Id);
                 packet.WriteInt(hero.Health);
             }
 
-            packet.WriteInt(Home.Characters.Heroes.Count); //hero state slot data
+            packet.WriteInt(Home.Characters.Heroes.Count);
             foreach (Hero hero in Home.Characters.Heroes)
             {
                 packet.WriteInt(hero.Id);
-                packet.WriteInt(3);
+                packet.WriteInt(hero.State);
             }
 
-            // Clan Units
-            packet.WriteInt(0);
+            packet.WriteInt(0); // Alliance units
 
-            packet.WriteInt(1);
-            packet.WriteInt(28000003);
-            packet.WriteInt(3);
-
-            packet.WriteInt(0);
-
-            // Tutorials | 10 = Set Name - 35 All tutorials 
-            /*var mission = Home.NameSet == 0 ? 10 : 35;
-            packet.WriteInt(mission);
-            for (var i = 0; i < mission; i++)
-                packet.WriteInt(21000000 + i);*/
-            var mission = 35;
-            packet.WriteInt(mission);
-            for (var i = 0; i < mission; i++)
+            const int tutorialSteps = 35;
+            packet.WriteInt(tutorialSteps);
+            for (var i = 0; i < tutorialSteps; i++)
                 packet.WriteInt(21000000 + i);
 
-            packet.WriteInt(0); // Achievements - 23000000
-            packet.WriteInt(0); // Completed Achievements Slots
+            packet.WriteInt(0); // Achievement IDs
+            packet.WriteInt(0); // Achievement progress
 
-            packet.WriteInt(94); // NPC
+            packet.WriteInt(94); // NPC levels
             for (var i = 17000000; i < 17000094; i++)
             {
                 packet.WriteInt(i);
                 packet.WriteInt(3);
             }
 
-            packet.WriteInt(0); // NPC Gold Gain
-            packet.WriteInt(0); // NPC Elixir Gain
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
+            packet.WriteInt(0); // Looted NPC gold
+            packet.WriteInt(0); // Looted NPC elixir
 
-            packet.WriteInt(0);
-            packet.WriteInt(0);
-            packet.WriteInt(0);
+            for (var i = 0; i < 4; i++)
+                packet.WriteInt(0);
 
-            packet.WriteInt(0);
-
-            packet.WriteInt(Home.Units.TroopsV2.Count); // Home Village 2 Troops
-            foreach (Unit troop in Home.Units.TroopsV2)
-            {
-                packet.WriteInt(troop.Id);
-                packet.WriteInt(troop.Count);
-            }
-
-            packet.WriteInt(0);
-            packet.WriteInt(0);
+            for (var i = 0; i < 5; i++)
+                packet.WriteInt(0);
         }
 
-		public void AvatarRankingEntry(IByteBuffer packet, int order, bool isPrevious = false)
+        public void AvatarRankingEntry(IByteBuffer packet, int order, bool isPrevious = false)
 		{
 			RankingEntry(packet, order, isPrevious);
 

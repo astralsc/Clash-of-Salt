@@ -7,7 +7,7 @@ namespace ClashofClans.Protocol.Messages.Server
     {
         public OwnHomeDataMessage(Device device) : base(device)
         {
-            Id = 25195;
+            Id = 24101;
             device.CurrentState = Device.State.Home;
             Device.LastVisitHome = DateTime.UtcNow;
         }

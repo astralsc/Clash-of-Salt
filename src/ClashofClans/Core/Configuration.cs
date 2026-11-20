@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using ClashofClans.Core.Network;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace ClashofClans.Core
 {
@@ -23,6 +25,9 @@ namespace ClashofClans.Core
 
         [JsonProperty("server_port")] public int ServerPort = 9339;
         [JsonProperty("update_url")] public string UpdateUrl = "https://github.com/astralsc/Clash-of-Salt";
+        [JsonProperty("encryption")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public PacketCipherMode Encryption = PacketCipherMode.Pepper;
 
         /// <summary>
         ///     Loads the configuration
@@ -41,6 +46,7 @@ namespace ClashofClans.Core
 
                     ServerPort = config.ServerPort;
                     UpdateUrl = config.UpdateUrl;
+                    Encryption = config.Encryption;
                 }
                 catch (Exception)
                 {

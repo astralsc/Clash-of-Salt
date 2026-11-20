@@ -37,18 +37,18 @@ namespace ClashofClans.Protocol.Messages.Client.Login
         public override async void Process()
         {
             /*if (FingerprintSha == Resources.Fingerprint.Sha)
-            {
+            {*/
                 await new ServerHelloMessage(Device)
                 {
                 }.SendAsync();
-            }
+            /*}
             else
-            {*/
+            {
                 await new LoginFailedMessage(Device)
                 {
                     ErrorCode = 8
                 }.SendAsync();
-            //}
+            }*/
         }
     }
 }

@@ -7,7 +7,7 @@ namespace ClashofClans.Protocol.Messages.Server
     {
         public LoginOkMessage(Device device) : base(device)
         {
-            Id = 23654;
+            Id = 20104;
             Version = 1;
         }
 
@@ -54,7 +54,7 @@ namespace ClashofClans.Protocol.Messages.Server
             Writer.WriteInt(1);
             Writer.WriteScString("https://event-assets.clashofclans.com");
 
-            Writer.WriteHex("FFFFFFFF0100FFFFFFFF");
+            //Writer.WriteHex("FFFFFFFF0100FFFFFFFF");
         }
     }
 }
