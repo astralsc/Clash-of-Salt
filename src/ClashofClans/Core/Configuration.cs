@@ -22,7 +22,7 @@ namespace ClashofClans.Core
         [JsonProperty("mysql_user")] public string MySqlUserId = "root";
 
         [JsonProperty("server_port")] public int ServerPort = 9339;
-        [JsonProperty("update_url")] public string UpdateUrl = "https://github.com/astralsc/CoS-10.322";
+        [JsonProperty("update_url")] public string UpdateUrl = "https://github.com/astralsc/Clash-of-Salt";
 
         /// <summary>
         ///     Loads the configuration
